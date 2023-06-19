@@ -3,80 +3,107 @@
 <head>
     <title>Color Detection Web App</title>
     <style>
-        #output {
+        #video {
+            display: block;
+            margin-bottom: 10px;
+        }
+        canvas {
             display: none;
+        }
+        .circle {
+            position: absolute;
+            border: 2px solid red;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .color-label {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
     <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="output" width="640" height="480"></canvas>
 
     <script type="text/javascript">
         var video = document.getElementById('video');
-        var outputCanvas = document.getElementById('output');
-        var outputContext = outputCanvas.getContext('2d');
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
 
-        // Request access to the camera
+        var circles = [];
+        var colors = [];
+
+        function drawCircles() {
+            var videoRect = video.getBoundingClientRect();
+            var scale = video.videoWidth / videoRect.width;
+
+            // Clear the previous circles
+            var prevCircles = document.querySelectorAll('.circle');
+            for (var i = 0; i < prevCircles.length; i++) {
+                prevCircles[i].remove();
+            }
+
+            // Draw the current circles
+            for (var i = 0; i < circles.length; i++) {
+                var circle = circles[i];
+                var x = circle[0] / scale;
+                var y = circle[1] / scale;
+                var radius = circle[2] / scale;
+                var color = colors[i];
+
+                // Create a circle element
+                var circleElement = document.createElement('div');
+                circleElement.className = 'circle';
+                circleElement.style.width = radius * 2 + 'px';
+                circleElement.style.height = radius * 2 + 'px';
+                circleElement.style.left = x - radius + 'px';
+                circleElement.style.top = y - radius + 'px';
+
+                // Create a color label element
+                var colorLabel = document.createElement('div');
+                colorLabel.className = 'color-label';
+                colorLabel.innerText = 'Color: ' + color;
+
+                // Append the circle and color label to the body
+                document.body.appendChild(circleElement);
+                document.body.appendChild(colorLabel);
+            }
+        }
+
+        function sendFrame() {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var frameData = canvas.toDataURL('image/jpeg');
+
+            fetch('/process_frame', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'frame_data=' + encodeURIComponent(frameData)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                circles = data.circles;
+                colors = data.colors;
+                drawCircles();
+                setTimeout(sendFrame, 100);
+            });
+        }
+
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
                 video.srcObject = stream;
-
-                // Function to process video frames
-                function processFrame() {
-                    // Draw the current video frame on the output canvas
-                    outputContext.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
-
-                    // Get the base64-encoded frame data from the output canvas
-                    var frameData = outputCanvas.toDataURL('image/jpeg');
-
-                    // Send the frame data to the Flask route for processing
-                    fetch('/process_frame', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: 'frame_data=' + encodeURIComponent(frameData)
-                    })
-                    .then(function(response) {
-                        // Parse the JSON response
-                        return response.json();
-                    })
-                    .then(function(data) {
-                        // Clear the output canvas
-                        outputContext.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-                        // Draw the processed frame on the output canvas
-                        outputContext.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
-
-                        // Draw the detected circles and color inside them
-                        data.circles.forEach(function(circle) {
-                            var x = circle.x;
-                            var y = circle.y;
-                            var radius = circle.radius;
-                            var color = circle.color;
-
-                            // Draw the circle
-                            outputContext.beginPath();
-                            outputContext.arc(x, y, radius, 0, 2 * Math.PI);
-                            outputContext.strokeStyle = 'red';
-                            outputContext.lineWidth = 2;
-                            outputContext.stroke();
-
-                            // Draw the color text
-                            outputContext.font = '16px Arial';
-                            outputContext.fillStyle = 'red';
-                            outputContext.fillText(color, x - radius, y - radius - 10);
-                        });
-
-                        // Schedule the next frame to be processed
-                        requestAnimationFrame(processFrame);
-                    });
-                }
-
-                // Start processing video frames
-                requestAnimationFrame(processFrame);
+                video.addEventListener('loadedmetadata', function() {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    sendFrame();
+                });
             })
             .catch(function(error) {
                 console.log('Camera access denied:', error);
