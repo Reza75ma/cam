@@ -3,37 +3,43 @@
 <head>
     <title>Color Detection Web App</title>
     <style>
-        .container {
+        #video-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
         }
-
         .video-box {
-            margin: 20px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
-    <div class="container">
+    <div id="video-container">
         <div class="video-box">
             <h2>Raw Video</h2>
             <video id="video-raw" width="640" height="480" autoplay></video>
         </div>
         <div class="video-box">
             <h2>Detected Circles</h2>
-            <video id="video-detected" width="640" height="480" autoplay></video>
+            <video id="video-circles" width="640" height="480" autoplay></video>
         </div>
     </div>
 
     <script type="text/javascript">
         var videoRaw = document.getElementById('video-raw');
-        var videoDetected = document.getElementById('video-detected');
+        var videoCircles = document.getElementById('video-circles');
 
         // Request access to the camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
                 videoRaw.srcObject = stream;
+
+                // Create a canvas element to capture video frames
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+                var canvasCircles = document.createElement('canvas');
+                var contextCircles = canvasCircles.getContext('2d');
+                var captureInterval = null;
 
                 // Function to send video frames to the server for processing
                 function sendFrame() {
@@ -44,7 +50,7 @@
                     var frameData = canvas.toDataURL('image/jpeg');
 
                     // Send the frame data to the server
-                    fetch('/process_frame', {
+                    fetch('/video_feed', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -52,19 +58,38 @@
                         body: 'frame_data=' + encodeURIComponent(frameData)
                     })
                     .then(function(response) {
-                        return response.json();
+                        // Get the processed frame from the response
+                        return response.blob();
                     })
-                    .then(function(data) {
-                        // Update the detected circles video with the processed frame
-                        videoDetected.src = data['frame_url'];
+                    .then(function(frameBlob) {
+                        // Create a URL object from the processed frame blob
+                        var frameURL = URL.createObjectURL(frameBlob);
 
-                        // Schedule the next frame to be sent after a delay
-                        requestAnimationFrame(sendFrame);
+                        // Update the video element with the processed frame
+                        videoCircles.src = frameURL;
                     });
                 }
 
-                // Start sending video frames to the server
-                sendFrame();
+                // Start capturing and sending video frames
+                function startCapture() {
+                    var videoWidth = videoRaw.videoWidth;
+                    var videoHeight = videoRaw.videoHeight;
+                    canvas.width = videoWidth;
+                    canvas.height = videoHeight;
+                    canvasCircles.width = videoWidth;
+                    canvasCircles.height = videoHeight;
+                    contextCircles.strokeStyle = '#00FF00';
+                    contextCircles.lineWidth = 3;
+                    captureInterval = setInterval(sendFrame, 100);
+                }
+
+                // Stop capturing video frames
+                function stopCapture() {
+                    clearInterval(captureInterval);
+                }
+
+                // Start capturing when the video stream is ready
+                videoRaw.onloadedmetadata = startCapture;
             })
             .catch(function(error) {
                 console.log('Camera access denied:', error);
