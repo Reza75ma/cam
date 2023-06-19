@@ -1,7 +1,9 @@
 # Import the required modules
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 import cv2
 import numpy as np
+import base64
+from io import BytesIO
 
 # Create the Flask application
 app = Flask(__name__)
@@ -104,9 +106,26 @@ def stream_frames():
     cap.release()
 
 # Route for streaming the video feed
-@app.route('/video_feed')
+@app.route('/video_feed', methods=['POST'])
 def video_feed():
-    return Response(stream_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    # Decode the base64-encoded frame data from the request
+    frame_data = base64.b64decode(request.form['frame_data'].split(',')[1])
+    nparr = np.frombuffer(frame_data, np.uint8)
+
+    # Decode the image array using OpenCV
+    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    # Process the frame as required
+    # ...
+
+    # Encode the processed frame to JPEG format
+    ret, jpeg = cv2.imencode('.jpg', frame)
+    frame_data = jpeg.tobytes()
+
+    # Return the processed frame as a response
+    return Response((b'--frame\r\n'
+                     b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n\r\n'),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Run the Flask application
 if __name__ == '__main__':
