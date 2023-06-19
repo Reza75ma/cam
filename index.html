@@ -3,38 +3,42 @@
 <head>
     <title>Color Detection Web App</title>
     <style>
-        #video {
-            position: relative;
+        .container {
+            display: flex;
+            justify-content: center;
         }
 
-        #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .video-box {
+            margin: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
-    <div id="container">
-        <video id="video" width="640" height="480" autoplay></video>
-        <canvas id="canvas" width="640" height="480"></canvas>
+    <div class="container">
+        <div class="video-box">
+            <h2>Raw Video</h2>
+            <video id="video-raw" width="640" height="480" autoplay></video>
+        </div>
+        <div class="video-box">
+            <h2>Detected Circles</h2>
+            <video id="video-detected" width="640" height="480" autoplay></video>
+        </div>
     </div>
 
     <script type="text/javascript">
-        var video = document.getElementById('video');
-        var canvas = document.getElementById('canvas');
-        var context = canvas.getContext('2d');
+        var videoRaw = document.getElementById('video-raw');
+        var videoDetected = document.getElementById('video-detected');
 
         // Request access to the camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
-                video.srcObject = stream;
+                videoRaw.srcObject = stream;
 
                 // Function to send video frames to the server for processing
                 function sendFrame() {
                     // Draw the current video frame on the canvas
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    context.drawImage(videoRaw, 0, 0, canvas.width, canvas.height);
 
                     // Get the base64-encoded frame data from the canvas
                     var frameData = canvas.toDataURL('image/jpeg');
@@ -51,23 +55,8 @@
                         return response.json();
                     })
                     .then(function(data) {
-                        // Clear the canvas
-                        context.clearRect(0, 0, canvas.width, canvas.height);
-
-                        // Draw the detected circles on the canvas
-                        var circles = data['circles'];
-                        for (var i = 0; i < circles.length; i++) {
-                            var circle = circles[i];
-                            var x = circle[0];
-                            var y = circle[1];
-                            var radius = circle[2];
-
-                            context.beginPath();
-                            context.arc(x, y, radius, 0, 2 * Math.PI);
-                            context.strokeStyle = 'green';
-                            context.lineWidth = 3;
-                            context.stroke();
-                        }
+                        // Update the detected circles video with the processed frame
+                        videoDetected.src = data['frame_url'];
 
                         // Schedule the next frame to be sent after a delay
                         requestAnimationFrame(sendFrame);
