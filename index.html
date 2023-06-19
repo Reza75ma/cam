@@ -2,33 +2,37 @@
 <html>
 <head>
     <title>Color Detection Web App</title>
+    <style>
+        #output {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
     <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="output" width="640" height="480"></canvas>
 
     <script type="text/javascript">
         var video = document.getElementById('video');
+        var outputCanvas = document.getElementById('output');
+        var outputContext = outputCanvas.getContext('2d');
 
         // Request access to the camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
                 video.srcObject = stream;
 
-                // Create a canvas element to capture video frames
-                var canvas = document.createElement('canvas');
-                var context = canvas.getContext('2d');
+                // Function to process video frames
+                function processFrame() {
+                    // Draw the current video frame on the output canvas
+                    outputContext.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
 
-                // Function to send video frames to the server for processing
-                function sendFrame() {
-                    // Draw the current video frame on the canvas
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    // Get the base64-encoded frame data from the output canvas
+                    var frameData = outputCanvas.toDataURL('image/jpeg');
 
-                    // Get the base64-encoded frame data from the canvas
-                    var frameData = canvas.toDataURL('image/jpeg');
-
-                    // Send the frame data to the server
-                    fetch('/video_feed', {
+                    // Send the frame data to the Flask route for processing
+                    fetch('/process_frame', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -36,23 +40,43 @@
                         body: 'frame_data=' + encodeURIComponent(frameData)
                     })
                     .then(function(response) {
-                        // Get the processed frame from the response
-                        return response.blob();
+                        // Parse the JSON response
+                        return response.json();
                     })
-                    .then(function(frameBlob) {
-                        // Create a URL object from the processed frame blob
-                        var frameURL = URL.createObjectURL(frameBlob);
+                    .then(function(data) {
+                        // Clear the output canvas
+                        outputContext.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
 
-                        // Update the video element with the processed frame
-                        video.src = frameURL;
+                        // Draw the processed frame on the output canvas
+                        outputContext.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
 
-                        // Schedule the next frame to be sent after a delay
-                        setTimeout(sendFrame, 100);
+                        // Draw the detected circles and color inside them
+                        data.circles.forEach(function(circle) {
+                            var x = circle.x;
+                            var y = circle.y;
+                            var radius = circle.radius;
+                            var color = circle.color;
+
+                            // Draw the circle
+                            outputContext.beginPath();
+                            outputContext.arc(x, y, radius, 0, 2 * Math.PI);
+                            outputContext.strokeStyle = 'red';
+                            outputContext.lineWidth = 2;
+                            outputContext.stroke();
+
+                            // Draw the color text
+                            outputContext.font = '16px Arial';
+                            outputContext.fillStyle = 'red';
+                            outputContext.fillText(color, x - radius, y - radius - 10);
+                        });
+
+                        // Schedule the next frame to be processed
+                        requestAnimationFrame(processFrame);
                     });
                 }
 
-                // Start sending video frames to the server
-                sendFrame();
+                // Start processing video frames
+                requestAnimationFrame(processFrame);
             })
             .catch(function(error) {
                 console.log('Camera access denied:', error);
