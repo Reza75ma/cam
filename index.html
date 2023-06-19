@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,15 +6,37 @@
 </head>
 <body>
     <h1>Color Detection Web App</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    <video id="video" width="640" height="480" autoplay></video>
     
     <script type="text/javascript">
-        var video = document.querySelector('img');
-        var source = new EventSource('/video_feed');
+        var video = document.getElementById('video');
         
-        source.addEventListener('message', function(event) {
-            video.src = 'data:image/jpeg;base64,' + event.data;
-        });
+        // Request access to the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                
+                // Create a WebSocket connection to the server
+                var socket = new WebSocket('ws://<your-server-address>:<your-port>');
+                
+                // Send video stream frames to the server
+                var mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = function(event) {
+                    socket.send(event.data);
+                };
+                
+                // Start recording video frames
+                mediaRecorder.start();
+                
+                // Stop recording video frames when the browser is closed or the page is unloaded
+                window.addEventListener('beforeunload', function() {
+                    mediaRecorder.stop();
+                    socket.close();
+                });
+            })
+            .catch(function(error) {
+                console.log('Camera access denied:', error);
+            });
     </script>
 </body>
 </html>
