@@ -3,48 +3,44 @@
 <head>
     <title>Color Detection Web App</title>
     <style>
-        #video-container {
-            display: flex;
-            justify-content: space-between;
+        #video {
+            display: inline-block;
+            margin-right: 10px;
         }
-        .video-box {
-            margin: 10px;
+        #circle-video {
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
-    <div id="video-container">
-        <div class="video-box">
-            <h2>Raw Video</h2>
-            <video id="video-raw" width="640" height="480" autoplay></video>
-        </div>
-        <div class="video-box">
-            <h2>Detected Circles</h2>
-            <video id="video-circles" width="640" height="480" autoplay></video>
-        </div>
+    <div>
+        <h2>Raw Video</h2>
+        <video id="video" width="640" height="480" autoplay></video>
+    </div>
+    <div>
+        <h2>Detected Circle Video</h2>
+        <video id="circle-video" width="640" height="480" autoplay></video>
     </div>
 
     <script type="text/javascript">
-        var videoRaw = document.getElementById('video-raw');
-        var videoCircles = document.getElementById('video-circles');
+        var video = document.getElementById('video');
+        var circleVideo = document.getElementById('circle-video');
 
         // Request access to the camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
-                videoRaw.srcObject = stream;
+                video.srcObject = stream;
+                circleVideo.src = "/video_feed";
 
                 // Create a canvas element to capture video frames
                 var canvas = document.createElement('canvas');
                 var context = canvas.getContext('2d');
-                var canvasCircles = document.createElement('canvas');
-                var contextCircles = canvasCircles.getContext('2d');
-                var captureInterval = null;
 
                 // Function to send video frames to the server for processing
                 function sendFrame() {
                     // Draw the current video frame on the canvas
-                    context.drawImage(videoRaw, 0, 0, canvas.width, canvas.height);
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                     // Get the base64-encoded frame data from the canvas
                     var frameData = canvas.toDataURL('image/jpeg');
@@ -58,38 +54,13 @@
                         body: 'frame_data=' + encodeURIComponent(frameData)
                     })
                     .then(function(response) {
-                        // Get the processed frame from the response
-                        return response.blob();
-                    })
-                    .then(function(frameBlob) {
-                        // Create a URL object from the processed frame blob
-                        var frameURL = URL.createObjectURL(frameBlob);
-
-                        // Update the video element with the processed frame
-                        videoCircles.src = frameURL;
+                        // Schedule the next frame to be sent after a delay
+                        setTimeout(sendFrame, 200);
                     });
                 }
 
-                // Start capturing and sending video frames
-                function startCapture() {
-                    var videoWidth = videoRaw.videoWidth;
-                    var videoHeight = videoRaw.videoHeight;
-                    canvas.width = videoWidth;
-                    canvas.height = videoHeight;
-                    canvasCircles.width = videoWidth;
-                    canvasCircles.height = videoHeight;
-                    contextCircles.strokeStyle = '#00FF00';
-                    contextCircles.lineWidth = 3;
-                    captureInterval = setInterval(sendFrame, 100);
-                }
-
-                // Stop capturing video frames
-                function stopCapture() {
-                    clearInterval(captureInterval);
-                }
-
-                // Start capturing when the video stream is ready
-                videoRaw.onloadedmetadata = startCapture;
+                // Start sending video frames to the server
+                sendFrame();
             })
             .catch(function(error) {
                 console.log('Camera access denied:', error);
