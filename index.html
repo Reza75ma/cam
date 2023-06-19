@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,32 +6,53 @@
 <body>
     <h1>Color Detection Web App</h1>
     <video id="video" width="640" height="480" autoplay></video>
-    
+
     <script type="text/javascript">
         var video = document.getElementById('video');
-        
+
         // Request access to the camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
                 video.srcObject = stream;
-                
-                // Create a WebSocket connection to the server
-                var socket = new WebSocket('ws://<your-server-address>:<your-port>');
-                
-                // Send video stream frames to the server
-                var mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = function(event) {
-                    socket.send(event.data);
-                };
-                
-                // Start recording video frames
-                mediaRecorder.start();
-                
-                // Stop recording video frames when the browser is closed or the page is unloaded
-                window.addEventListener('beforeunload', function() {
-                    mediaRecorder.stop();
-                    socket.close();
-                });
+
+                // Create a canvas element to capture video frames
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+
+                // Function to send video frames to the server for processing
+                function sendFrame() {
+                    // Draw the current video frame on the canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Get the base64-encoded frame data from the canvas
+                    var frameData = canvas.toDataURL('image/jpeg');
+
+                    // Send the frame data to the server
+                    fetch('/video_feed', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'frame_data=' + encodeURIComponent(frameData)
+                    })
+                    .then(function(response) {
+                        // Get the processed frame from the response
+                        return response.blob();
+                    })
+                    .then(function(frameBlob) {
+                        // Create a URL object from the processed frame blob
+                        var frameURL = URL.createObjectURL(frameBlob);
+
+                        // Update the video element with the processed frame
+                        video.src = frameURL;
+
+                        // Schedule the next frame to be sent after a delay
+                        setTimeout(sendFrame, 100);
+                    });
+                }
+
+                // Start sending video frames to the server
+                sendFrame();
             })
             .catch(function(error) {
                 console.log('Camera access denied:', error);
