@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, request, jsonify
 import cv2
 import numpy as np
 
@@ -8,68 +8,42 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-def stream_frames():
-    cap = cv2.VideoCapture(0)
-    framewidth = 640
-    frameheight = 480
-    cap.set(3, framewidth)
-    cap.set(4, frameheight)
+# Route for processing the video frame and detecting circles
+@app.route('/process_frame', methods=['POST'])
+def process_frame():
+    frame_data = request.form['frame_data']
 
-    color_dict = {
-        (200, 160, 180): "Fresh",
-        (170, 170, 180): "Still Fresh",
-        (100, 200, 210): "Past Best",
-    }
+    # Decode the frame data from base64
+    frame_decoded = np.frombuffer(frame_data, np.uint8)
+    frame = cv2.imdecode(frame_decoded, cv2.IMREAD_COLOR)
 
-    def get_closest_color(color):
-        distances = {np.linalg.norm(np.array(color) - np.array(k)): v for k, v in color_dict.items()}
-        return distances[min(distances)]
+    # Process the frame, detect circles, and get the colors
+    # Replace this with your circle detection and color extraction logic
+    circles = []
+    colors = []
 
-    prevcircle = None
-    dist = lambda x1, y1, x2, y2: (x1 - x2) ** 2 + (y1 - y2) ** 2
+    # Example code to detect circles (replace with your implementation)
+    grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    blurFrame = cv2.GaussianBlur(grayFrame, (17, 17), 0)
+    circles = cv2.HoughCircles(blurFrame, cv2.HOUGH_GRADIENT, 1.2, 100,
+                               param1=100, param2=40, minRadius=20, maxRadius=150)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Failed to grab frame")
-            break
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
 
-        grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blurFrame = cv2.GaussianBlur(grayFrame, (17, 17), 0)
-        circles = cv2.HoughCircles(blurFrame, cv2.HOUGH_GRADIENT, 1.2, 100,
-                                   param1=100, param2=40, minRadius=20, maxRadius=150)
-
-        if circles is not None:
-            circles = np.uint16(np.around(circles))
-            chosen = None
-
-            for i in circles[0, :]:
-                if chosen is None:
-                    chosen = i
-                if prevcircle is not None:
-                    if dist(chosen[0], chosen[1], prevcircle[0], prevcircle[1]) <= dist(i[0], i[1], prevcircle[0], prevcircle[1]):
-                        chosen = i
-
-            prevcircle = chosen
-            x, y, radius = chosen
+        for circle in circles[0, :]:
+            x, y, radius = circle
             roi = frame[y - radius: y + radius, x - radius: x + radius]
             average_color = cv2.mean(roi)[:3]
-            color_name = get_closest_color(average_color)
+            colors.append(average_color)
 
-            cv2.circle(frame, (x, y), radius, (255, 0, 255), 3)
-            cv2.putText(frame, f"Color: {color_name}", (int(x - radius), int(y - radius - 10)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+    # Prepare the response data
+    response_data = {
+        'circles': circles.tolist(),
+        'colors': colors
+    }
 
-        ret, jpeg = cv2.imencode('.jpg', frame)
-        frame_data = jpeg.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n\r\n')
-
-    cap.release()
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(stream_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
