@@ -1,8 +1,7 @@
 # Import the required modules
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response
 import cv2
 import numpy as np
-import base64
 
 # Create the Flask application
 app = Flask(__name__)
@@ -14,7 +13,7 @@ def home():
 
 # Generator function for streaming video frames
 def stream_frames():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     # Set the frame width and height
     framewidth = 640
@@ -89,27 +88,26 @@ def stream_frames():
             color_name = get_closest_color(average_color)
 
             # Draw the detected circle and display the color name
-            cv2.circle(frame, (x, y), radius, (0, 255, 0), 3)
-            cv2.putText(frame, color_name, (x - 20, y - radius - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+            cv2.circle(frame, (x, y), radius, (255, 0, 255), 3)
+            cv2.putText(frame, f"Color: {color_name}", (int(x - radius), int(y - radius - 10)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
 
-        # Convert the frame to JPEG format
+        # Convert the OpenCV frame to JPEG format
         ret, jpeg = cv2.imencode('.jpg', frame)
+        frame_data = jpeg.tobytes()
 
-        # Encode the frame as base64
-        encoded_frame = base64.b64encode(jpeg.tobytes()).decode('utf-8')
-
-        # Yield the base64-encoded frame
+        # Yield the frame data as a response to update the web page
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + encoded_frame + b'\r\n\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n\r\n')
 
-    # Release the video capture and destroy any remaining windows
+    # Release the camera
     cap.release()
-    cv2.destroyAllWindows()
 
-# Define the route for video streaming
+# Route for streaming the video feed
 @app.route('/video_feed')
 def video_feed():
     return Response(stream_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+# Run the Flask application
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
