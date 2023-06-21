@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Create a video capture object
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Set the frame width and height
 framewidth = 640
@@ -94,4 +94,3 @@ while True:
 # Release the camera and destroy the window
 cap.release()
 cv2.destroyAllWindows()
-
