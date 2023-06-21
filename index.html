@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Color Detection Web App</title>
+</head>
+<body>
+    <h1>Color Detection Web App</h1>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    
+    <script type="text/javascript">
+        var video = document.querySelector('img');
+        var source = new EventSource('/video_feed');
+        
+        source.addEventListener('message', function(event) {
+            video.src = 'data:image/jpeg;base64,' + event.data;
+        });
+    </script>
+</body>
+</html>
