@@ -2,69 +2,18 @@
 <html>
 <head>
     <title>Color Detection Web App</title>
-    <style>
-        #video {
-            display: inline-block;
-            margin-right: 10px;
-        }
-        #circle-video {
-            display: inline-block;
-        }
-    </style>
 </head>
 <body>
     <h1>Color Detection Web App</h1>
-    <div>
-        <h2>Raw Video</h2>
-        <video id="video" width="640" height="480" autoplay></video>
-    </div>
-    <div>
-        <h2>Detected Circle Video</h2>
-        <video id="circle-video" width="640" height="480" autoplay></video>
-    </div>
-
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    
     <script type="text/javascript">
-        var video = document.getElementById('video');
-        var circleVideo = document.getElementById('circle-video');
-
-        // Request access to the camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                video.srcObject = stream;
-                circleVideo.src = "/video_feed";
-
-                // Create a canvas element to capture video frames
-                var canvas = document.createElement('canvas');
-                var context = canvas.getContext('2d');
-
-                // Function to send video frames to the server for processing
-                function sendFrame() {
-                    // Draw the current video frame on the canvas
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    // Get the base64-encoded frame data from the canvas
-                    var frameData = canvas.toDataURL('image/jpeg');
-
-                    // Send the frame data to the server
-                    fetch('/video_feed', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: 'frame_data=' + encodeURIComponent(frameData)
-                    })
-                    .then(function(response) {
-                        // Schedule the next frame to be sent after a delay
-                        setTimeout(sendFrame, 200);
-                    });
-                }
-
-                // Start sending video frames to the server
-                sendFrame();
-            })
-            .catch(function(error) {
-                console.log('Camera access denied:', error);
-            });
+        var video = document.querySelector('img');
+        var source = new EventSource('/video_feed');
+        
+        source.addEventListener('message', function(event) {
+            video.src = 'data:image/jpeg;base64,' + event.data;
+        });
     </script>
 </body>
 </html>
