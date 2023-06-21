@@ -13,7 +13,7 @@ def home():
 
 # Generator function for streaming video frames
 def stream_frames():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     # Set the frame width and height
     framewidth = 640
