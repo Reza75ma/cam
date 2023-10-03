@@ -1,19 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Color Detection Web App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Resume</title>
 </head>
 <body>
-    <h1>Color Detection Web App</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480">
-    
-    <script type="text/javascript">
-        var video = document.querySelector('img');
-        var source = new EventSource('/video_feed');
-        
-        source.addEventListener('message', function(event) {
-            video.src = 'data:image/jpeg;base64,' + event.data;
-        });
-    </script>
+<h1>Farbod Naderi Haghighat</h1>
+<img src="../photo_2023-03-11_13-50-21.jpg" height="200" alt="My Image">
+<h2>About Me</h2>
+<p>I am Farbod Naderi, Bachelor of Electrical engineering from Khajeh Nasir Toosi University of Technology.<br/>My major skills are programming in different languages, content production and marketing.</p>
+<hr/>
+<h2>Education</h2>
+<p>I am bachelor student of Electrical engineering at <a href="https://kntu.ac.ir/">Khajeh Nasir Toosi University of Technology</a></p>  
+<hr/>
+<h2>Experience</h2>
+<h4>CMO at <a href="https://www.virasmart.co/">Vira Smart Label </a>since Jan 2022</h4>
+<h2>Licenses & Certifications</h2>
+<ul>
+    <li><a href="https://www.coursera.org/account/accomplishments/certificate/NQZMHFEZ84DF">The Strategy of Content Marketing (Coursera)</a></li>    
+    <li><a href="https://learndigital.withgoogle.com/digitalgarage/validate-certificate-code">The Fundamentals of Digital Mrketing (Google Digital Garage)</a></li>
+</ul>
+<hr/>
+<h2>Skills</h2>
+<ul>
+    <li>Digtal Marketing</li>
+    <li>Arduino</li>
+    <li>Content Producing</li>
+    <li>AVR</li>
+    <li>MATLAB</li>
+    <li>C</li>
+    <li>Assembly Language</li>
+    <li>After Effects</li>
+    <li>Adobe Ilustrator</li>
+    <li>PLC</li>
+    <li>Electronics</li>
+    <li>HTML</li>
+    <li>Proteus</li>
+    <li>Content Strategy</li>
+    <li>Content Marketing</li>
+    <li>Online Content Creation</li>
+    <li>Creative Content Production</li>
+    <li>Enginering</li>
+    <li>VHDL</li>
+    <li>Microsoft Office</li>
+    <li>CSS</li>
+</ul>
+<hr/>
+<h2>Contact Me
+<h4>Phone Number: +989190725293 <br/>
+<a href="https://www.instagram.com/farrr_bod/">My Instagram Page</a><br/>
+<a href="https://www.linkedin.com/in/farbod-naderi-haghighat-951249229/">My Linkedin Page</a>
+</h4>
+</h2>
 </body>
 </html>
