@@ -3,55 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Resume</title>
+    <title>Camera App</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #camera-feed {
+            width: 100%;
+            max-width: 640px; /* adjust the max-width as needed */
+            border: 2px solid red; /* square border color */
+        }
+        #capture-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<h1>Farbod Naderi Haghighat</h1>
-<img src="./photo_2023-03-11_13-50-21.jpg" height="200" alt="My Image">
-<h2>About Me</h2>
-<p>I am Farbod Naderi, Bachelor of Electrical engineering from Khajeh Nasir Toosi University of Technology.<br/>My major skills are programming in different languages, content production and marketing.</p>
-<hr/>
-<h2>Education</h2>
-<p>I am bachelor student of Electrical engineering at <a href="https://kntu.ac.ir/">Khajeh Nasir Toosi University of Technology</a></p>  
-<hr/>
-<h2>Experience</h2>
-<h4>CMO at <a href="https://www.virasmart.co/">Vira Smart Label </a>since Jan 2022</h4>
-<h2>Licenses & Certifications</h2>
-<ul>
-    <li><a href="https://www.coursera.org/account/accomplishments/certificate/NQZMHFEZ84DF">The Strategy of Content Marketing (Coursera)</a></li>    
-    <li><a href="https://learndigital.withgoogle.com/digitalgarage/validate-certificate-code">The Fundamentals of Digital Mrketing (Google Digital Garage)</a></li>
-</ul>
-<hr/>
-<h2>Skills</h2>
-<ul>
-    <li>Digtal Marketing</li>
-    <li>Arduino</li>
-    <li>Content Producing</li>
-    <li>AVR</li>
-    <li>MATLAB</li>
-    <li>C</li>
-    <li>Assembly Language</li>
-    <li>After Effects</li>
-    <li>Adobe Ilustrator</li>
-    <li>PLC</li>
-    <li>Electronics</li>
-    <li>HTML</li>
-    <li>Proteus</li>
-    <li>Content Strategy</li>
-    <li>Content Marketing</li>
-    <li>Online Content Creation</li>
-    <li>Creative Content Production</li>
-    <li>Enginering</li>
-    <li>VHDL</li>
-    <li>Microsoft Office</li>
-    <li>CSS</li>
-</ul>
-<hr/>
-<h2>Contact Me
-<h4>Phone Number: +989190725293 <br/>
-<a href="https://www.instagram.com/farrr_bod/">My Instagram Page</a><br/>
-<a href="https://www.linkedin.com/in/farbod-naderi-haghighat-951249229/">My Linkedin Page</a>
-</h4>
-</h2>
+    <canvas id="camera-feed"></canvas>
+    <button id="capture-button" onclick="capturePhoto()">Take Photo</button>
+
+    <script>
+        const videoCanvas = document.getElementById('camera-feed');
+        const videoContext = videoCanvas.getContext('2d');
+
+        // Access the camera and display the video feed
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                const videoElement = document.createElement('video');
+                videoElement.srcObject = stream;
+                videoElement.addEventListener('loadedmetadata', () => {
+                    videoCanvas.width = videoElement.videoWidth;
+                    videoCanvas.height = videoElement.videoHeight;
+                    drawVideoFrame(videoElement, videoContext);
+                });
+                videoElement.play();
+            })
+            .catch((error) => {
+                console.error('Error accessing camera:', error);
+            });
+
+        // Function to draw the video frame on the canvas
+        function drawVideoFrame(video, context) {
+            context.drawImage(video, 0, 0, videoCanvas.width, videoCanvas.height);
+
+            // Draw a square on the canvas
+            const squareSizeMM = 90;
+            const squareSizePixels = squareSizeMM * (videoCanvas.width / 640); // Adjust based on max-width
+            const squareColor = 'green';
+            const x = (videoCanvas.width - squareSizePixels) / 2;
+            const y = (videoCanvas.height - squareSizePixels) / 2;
+
+            context.strokeStyle = squareColor;
+            context.lineWidth = 2;
+            context.strokeRect(x, y, squareSizePixels, squareSizePixels);
+
+            requestAnimationFrame(() => drawVideoFrame(video, context));
+        }
+
+        // Function to capture a photo
+        async function capturePhoto() {
+            // Capture the current frame from the video feed
+            const capturedFrame = document.createElement('canvas');
+            capturedFrame.width = videoCanvas.width;
+            capturedFrame.height = videoCanvas.height;
+            const capturedFrameContext = capturedFrame.getContext('2d');
+            capturedFrameContext.drawImage(videoCanvas, 0, 0, videoCanvas.width, videoCanvas.height);
+
+            // Convert the captured frame to a Blob with JPG format
+            const blob = await new Promise(resolve => capturedFrame.toBlob(resolve, 'image/jpeg'));
+
+            // Request file system access
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: 'captured_photo.jpg',
+                    types: [
+                        {
+                            description: 'JPEG Files',
+                            accept: {
+                                'image/jpeg': ['.jpg', '.jpeg'],
+                            },
+                        },
+                    ],
+                });
+
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+            } catch (error) {
+                console.error('Error saving file:', error);
+            }
+        }
+    </script>
 </body>
 </html>
