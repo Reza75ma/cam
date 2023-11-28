@@ -55,7 +55,6 @@ async function captureAndSend() {
         // Pause the video feed
         videoStream.getTracks().forEach(track => track.stop());
 
-
         // Capture the current frame from the video feed
         const capturedFrame = document.createElement('canvas');
         capturedFrame.width = videoCanvas.width;
