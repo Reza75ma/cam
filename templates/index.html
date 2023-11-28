@@ -1,109 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera App</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        #camera-feed {
-            width: 100%;
-            max-width: 640px; /* adjust the max-width as needed */
-            border: 2px solid red; /* square border color */
-        }
-        #capture-button {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="./index.css">
 </head>
+
 <body>
-    <canvas id="camera-feed"></canvas>
-    <button id="capture-button" onclick="capturePhoto()">Take Photo</button>
+    <div class="firstlayer">
+        <section class="First">
+            <div class="halo1"></div>
+            <img class="headerpic" src="./fpdl_in_bottle_milk_glass_milk_plate_cheese_table_front_field_cows.jpg"
+                alt="firslayer pic">
+            <div class="logoheader">
+                <h1 class="logotitle">پلتفرم هوشمند ویرا</h1>
+                <img class="logo" src="./FinalLogoWhite-01.png" alt="FinalLogoWhite-01">
+            </div>
+        </section>
+    </div>
+    <section class="Second">
+        <h2 id="title2">ما چیکار می‌کنیم؟</h2>
+        <p id="detail" dir="rtl">به پلتفرم هوشمند ویرا خوش آمدید. ما برای مدیریت بهتر زنجیره حمل و نقل و فروش محصولات به
+            شما
+            کمک می‌کنیم.</p>
+        <div class="Platform">
+            <img id="apppic" src="./3d-render-smartphone-black-hands-with-finger.jpg" alt="platform">
+            <p id="Tozihat" dir="rtl">با توجه به مشکلات موجود در حوزه بسته بندی، تاریخ انقضاء فعلی و حمل و نقل مواد
+                غذایی، که
+                باعث ایجاد مسمومیت‌های احتمالی و هدررفت چشمگیر مواد غذایی می‌شوند، گروهی از متخصصان ویرا برآن شدند که
+                برچسبی
+                هوشمند به منظور پایش لحظه‌ای سلامت مواد‌ غذایی، از زمان تولید تا مصرف، طراحی نمایند تا علاوه بر سهولت در
+                استفاده
+                برای همه اقشار جامعه بتواند نقش مهمی در هوشمند سازی سیستم‌های کنترل شرایط نگهداری محصولات غذایی به هنگام
+                حمل و
+                نقل، فروش و در جهت کاهش هدررفت و مرجوعی این محصولات ایفا کنیم.</p>
+        </div>
+    </section>
+    <section class="third">
+        <canvas id="camera-feed"></canvas>
+        <button id="capture-button" onclick="captureAndSend()"><span>شروع اسکن</span></button>
+        <div id="response-box">
+            <h2>Server Response</h2>
+            <img id="server-response-image" alt="Server Response Image">
+        </div>
+    </section>
+    <footer>
+        <section class="layer">
+            <div class="halo2"></div>
+            <img class="contactus" src="./customer_service_business_contact_concept_wooden_cube_block_which.jpg"
+                alt="Contact Us">
+            <div class="frame">
+                <div class="logo_slogan">
+                    <img class="footerlogo" src="./WhiteLogo-01-qaltvj4u38cdjmj46wyc81djvljhwgvck81bjuduu4.png"
+                        alt="Logo footer">
+                    <p class="slogan">انتخاب هوشمند، زندگی سالم</p>
+                </div>
+                <div class="contact_us" dir="rtl">
+                    <p class="headerfooter">تماس با ما</p>
+                    <div class="line1"></div>
+                    <p class="address" dir="rtl">ایران، تهران، میدان آزادی، کارخانه نوآوری آزادی<br /> سوله دیجی‌نکست،
+                        شرکت
+                        نوآوران
+                        صنعت کاکتوس</p>
+                    <div class="line2"></div>
+                    <p class="phone">989303233439+</p>
+                    <div class="line3"></div>
+                    <p class="gmail">info@virasmart.co</p>
 
-    <script>
-        const videoCanvas = document.getElementById('camera-feed');
-        const videoContext = videoCanvas.getContext('2d');
-
-        // Access the camera and display the video feed
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                const videoElement = document.createElement('video');
-                videoElement.srcObject = stream;
-                videoElement.addEventListener('loadedmetadata', () => {
-                    videoCanvas.width = videoElement.videoWidth;
-                    videoCanvas.height = videoElement.videoHeight;
-                    drawVideoFrame(videoElement, videoContext);
-                });
-                videoElement.play();
-            })
-            .catch((error) => {
-                console.error('Error accessing camera:', error);
-            });
-
-        // Function to draw the video frame on the canvas
-        function drawVideoFrame(video, context) {
-            context.drawImage(video, 0, 0, videoCanvas.width, videoCanvas.height);
-
-            // Draw a square on the canvas
-            const squareSizeMM = 90;
-            const squareSizePixels = squareSizeMM * (videoCanvas.width / 640); // Adjust based on max-width
-            const squareColor = 'green';
-            const x = (videoCanvas.width - squareSizePixels) / 2;
-            const y = (videoCanvas.height - squareSizePixels) / 2;
-
-            context.strokeStyle = squareColor;
-            context.lineWidth = 2;
-            context.strokeRect(x, y, squareSizePixels, squareSizePixels);
-
-            requestAnimationFrame(() => drawVideoFrame(video, context));
-        }
-
-        // Function to capture a photo
-        async function capturePhoto() {
-            // Capture the current frame from the video feed
-            const capturedFrame = document.createElement('canvas');
-            capturedFrame.width = videoCanvas.width;
-            capturedFrame.height = videoCanvas.height;
-            const capturedFrameContext = capturedFrame.getContext('2d');
-            capturedFrameContext.drawImage(videoCanvas, 0, 0, videoCanvas.width, videoCanvas.height);
-
-            // Convert the captured frame to a Blob with JPG format
-            const blob = await new Promise(resolve => capturedFrame.toBlob(resolve, 'image/jpeg'));
-
-            // Request file system access
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: 'captured_photo.jpg',
-                    types: [
-                        {
-                            description: 'JPEG Files',
-                            accept: {
-                                'image/jpeg': ['.jpg', '.jpeg'],
-                            },
-                        },
-                    ],
-                });
-
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-            } catch (error) {
-                console.error('Error saving file:', error);
-            }
-        }
-    </script>
+                </div>
+            </div>
+        </section>
+    </footer>
+    <script src="./Index.js"></script>
 </body>
+
 </html>

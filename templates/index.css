@@ -1,0 +1,395 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#camera-feed {
+    width: 100%;
+    max-width: 640px;
+    /* adjust the max-width as needed */
+    border: 2px solid red;
+    /* square border color */
+}
+
+#capture-button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#response-box {
+    margin-top: 20px;
+    padding: 10px;
+    border: 2px solid #4CAF50;
+    border-radius: 5px;
+    display: none;
+    /* initially hide the response box */
+}
+
+#server-response-image {
+    max-width: 100%;
+    height: auto;
+}
+
+@font-face {
+    font-family: 'IRANSANSX';
+    src: url(C:\Users\fnade\AppData\Local\Microsoft\Windows\Fonts\IRANSANSXTHIN.TTF);
+}
+
+body {
+    font-family: 'IRANSANSX';
+    margin: 0%;
+    padding: 0;
+}
+
+/* picture in header */
+.headerpic {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 460px;
+    object-fit: cover;
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
+}
+
+/* halo in header top of picture */
+.halo1 {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    background-color: rgb(14, 12, 12);
+    width: 100%;
+    height: 460px;
+    opacity: 0.65;
+    z-index: 1;
+    box-shadow: 0px 2px 0px 0px rgba(75, 75, 75);
+}
+
+/* Logo and title in header */
+.logoheader {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 0%;
+    left: 40%;
+    height: 460px;
+    z-index: 2;
+}
+
+/* title in header */
+.logotitle {
+    font-family: 'IRANSANSX';
+    font-size: 35px;
+    color: white;
+    display: flex;
+    align-self: center;
+    margin: 0%;
+    padding: 0%;
+    margin-top: 100px;
+    left: 0%;
+}
+
+/* logo in header */
+.logo {
+    display: flex;
+    height: 170px;
+    width: 170px;
+    align-self: center;
+    margin-top: 25px;
+}
+
+/* Defining Second section */
+.Second {
+    position: absolute;
+    width: 100%;
+    height: 2000px;
+    top: 460px;
+}
+
+/* Second section title brief box */
+.brief {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+/* What we do question */
+#title2 {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-family: 'IRANSANSX';
+    font-size: 35px;
+    color: #6b218e;
+    margin-top: 100px;
+    align-content: center;
+}
+
+/* Welcome text */
+#detail {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-family: 'IRANSANSX';
+    font-size: 20px;
+    font-weight: 800;
+    color: #353535;
+    margin-top: 40px;
+    align-content: center;
+}
+
+/* Platform explanation box */
+.Platform {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 95%;
+    margin-left: 40px;
+    margin-top: 100px;
+    box-shadow: 0px 0px 20px rgb(75, 75, 75);
+    border-radius: 30px;
+}
+
+/* Platform Picture */
+#apppic {
+    display: flex;
+    height: 600px;
+    width: 600px;
+    padding: 0%;
+    margin: 0%;
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+/* Details accross platform pic */
+#Tozihat {
+    display: flex;
+    flex-wrap: nowrap;
+    font-family: 'IRANSANSX';
+    font-size: 26px;
+    font-weight: 500;
+    color: #353535;
+    height: 400px;
+    width: 700px;
+    text-align: justify;
+    margin-top: 150px;
+    margin-left: 100px;
+    padding-right: 10px;
+    max-width: 700px;
+    min-width: 200px;
+}
+
+/* Button Design */
+.button {
+    display: inline-block;
+    border-radius: 20px;
+    background-color: #8533ae;
+    position: relative;
+    left: 30%;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    font-family: 'IRANSANSX';
+}
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.button:hover span {
+    padding-right: 25px;
+}
+
+.button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.button:focus {
+    outline: none;
+}
+/* Third Section */
+.third {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    top: 1450px;
+}
+/* Button */
+#capture-button {
+    display: inline-block;
+    border-radius: 10px;
+    background-color: #8533ae;
+    position: absolute;
+    left: 30%;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    font-family: 'IRANSANSX';
+    top: 430px;
+  }
+  
+  #capture-button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+  }
+  
+  #capture-button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+  }
+  
+  #capture-button:hover span {
+    padding-right: 25px;
+  }
+  
+  #capture-button:hover span:after {
+    opacity: 1;
+    right: 0;
+  }
+  
+  #capture-button:focus {
+    outline: none;
+  }
+/* Camera border */
+#camera-feed {
+    height: 400px;
+    width: 800px;
+}
+
+/* Footer Box */
+.halo2 {
+    top: 2200px;
+    width: 100%;
+    height: 500px;
+    position: absolute;
+    left: 0px;
+    background-color: black;
+    opacity: 0.65;
+}
+
+/* Contacgt us footer pic */
+.contactus {
+    top: 2200px;
+    width: 100%;
+    height: 500px;
+    position: absolute;
+    left: 0px;
+    z-index: -1;
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
+    object-fit: cover;
+}
+
+/* Footer Frame */
+.frame {
+    position: absolute;
+    /* display: flex; */
+    top: 2200px;
+    height: 500px;
+    flex-direction: row;
+    flex-direction: wrap;
+}
+
+/* Logo and its slogan in footer */
+.logo_slogan {
+    position: absolute;
+    right: 700px;
+    display: flex;
+    width: 250px;
+    flex-direction: column;
+    justify-self: center;
+    align-self: center;
+    margin-top: 150px;
+}
+
+/* Contact us in footer */
+.contact_us {
+    font-weight: 600;
+    font-size: 20px;
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    align-self: center;
+    text-align: justify;
+    margin-top: 100px;
+    position: relative;
+    left: 100px;
+}
+
+/* First line in contact us in footer */
+.line1 {
+    background-color: white;
+    height: 2.5px;
+    width: 200px;
+}
+
+/* Second line in contact us in footer */
+.line2 {
+    background-color: white;
+    height: 2.5px;
+    width: 200px;
+}
+
+/* Third line in contact us in footer */
+.line3 {
+    background-color: white;
+    height: 3px;
+    width: 200px;
+}
+
+/* Logo in footer */
+.footerlogo {
+    height: 150px;
+    width: 150px;
+    align-self: center;
+}
+
+/* Slogan under the logo in footer */
+.slogan {
+
+    font-weight: 600;
+    font-size: 20px;
+    color: #FFFFFF;
+}
