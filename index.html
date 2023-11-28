@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera App</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div class="firstlayer">
+        <section class="First">
+            <div class="halo1"></div>
+            <img class="headerpic" src="./fpdl_in_bottle_milk_glass_milk_plate_cheese_table_front_field_cows.jpg"
+                alt="firslayer pic">
+            <div class="logoheader">
+                <h1 class="logotitle">پلتفرم هوشمند ویرا</h1>
+                <img class="logo" src="./FinalLogoWhite-01.png" alt="FinalLogoWhite-01">
+            </div>
+        </section>
+    </div>
+    <section class="Second">
+        <h2 id="title2">ما چیکار می‌کنیم؟</h2>
+        <p id="detail" dir="rtl">به پلتفرم هوشمند ویرا خوش آمدید. ما برای مدیریت بهتر زنجیره حمل و نقل و فروش محصولات به
+            شما
+            کمک می‌کنیم.</p>
+        <div class="Platform">
+            <img id="apppic" src="./3d-render-smartphone-black-hands-with-finger.jpg" alt="platform">
+            <p id="Tozihat" dir="rtl">با توجه به مشکلات موجود در حوزه بسته بندی، تاریخ انقضاء فعلی و حمل و نقل مواد
+                غذایی، که
+                باعث ایجاد مسمومیت‌های احتمالی و هدررفت چشمگیر مواد غذایی می‌شوند، گروهی از متخصصان ویرا برآن شدند که
+                برچسبی
+                هوشمند به منظور پایش لحظه‌ای سلامت مواد‌ غذایی، از زمان تولید تا مصرف، طراحی نمایند تا علاوه بر سهولت در
+                استفاده
+                برای همه اقشار جامعه بتواند نقش مهمی در هوشمند سازی سیستم‌های کنترل شرایط نگهداری محصولات غذایی به هنگام
+                حمل و
+                نقل، فروش و در جهت کاهش هدررفت و مرجوعی این محصولات ایفا کنیم.</p>
+        </div>
+    </section>
+    <section class="third">
+        <canvas id="camera-feed"></canvas>
+        <button id="capture-button" onclick="captureAndSend()"><span>شروع اسکن</span></button>
+        <div id="response-box">
+            <h2>Server Response</h2>
+            <img id="server-response-image" alt="Server Response Image">
+        </div>
+    </section>
+    <footer>
+        <section class="layer">
+            <div class="halo2"></div>
+            <img class="contactus" src="./customer_service_business_contact_concept_wooden_cube_block_which.jpg"
+                alt="Contact Us">
+            <div class="frame">
+                <div class="logo_slogan">
+                    <img class="footerlogo" src="./WhiteLogo-01-qaltvj4u38cdjmj46wyc81djvljhwgvck81bjuduu4.png"
+                        alt="Logo footer">
+                    <p class="slogan">انتخاب هوشمند، زندگی سالم</p>
+                </div>
+                <div class="contact_us" dir="rtl">
+                    <p class="headerfooter">تماس با ما</p>
+                    <div class="line1"></div>
+                    <p class="address" dir="rtl">ایران، تهران، میدان آزادی، کارخانه نوآوری آزادی<br /> سوله دیجی‌نکست،
+                        شرکت
+                        نوآوران
+                        صنعت کاکتوس</p>
+                    <div class="line2"></div>
+                    <p class="phone">989303233439+</p>
+                    <div class="line3"></div>
+                    <p class="gmail">info@virasmart.co</p>
+
+                </div>
+            </div>
+        </section>
+    </footer>
+    <script src="./Index.js"></script>
+</body>
+
+</html>
